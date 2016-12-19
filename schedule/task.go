@@ -5,39 +5,39 @@ import (
 )
 
 const (
-	Asp = iota
-	Alp
+	Asap = iota // as soon as possible
+	Alap        // as late as possible
 )
 
-// Taks type includes number, type (ASP or ALP), remark, duration,
-// earliest and latest start time.
+// Taks type includes type (ASAP or ALAP), remark, start time,
+// duration, earliest and latest start time.
 type Task struct {
-	n, t    int
-	r       string
-	d, e, l float32
+	t    int
+	r    string
+	s, d float32
+	e, l float32
 }
 
-/*
-func NewTaskByNumber(n int) *Task {
-	return &Task{n, Asp, fmt.Sprint("Task_", n), 0.0, 0.0, 0.0}
-}*/
-
-// NewTask returns new task by number, type, remark, duration and
+// NewTask returns new task by number, type, remark and duration
 // with zero earliest and latest start time.
-func NewTask(n, t int, r string, d float32) *Task {
-	if t == Asp {
-		t = Alp
+func NewTask(t int, r string, d float32) *Task {
+	if t != Asap {
+		t = Alap
 	}
-	return &Task{n, t, r, d, 0.0, 0.0}
+	return &Task{t, r, 0.0, d, 0.0, 0.0}
 }
 
 // String returns short information about task.
 func (t *Task) String() string {
-	tT := "ASP"
-	if t.t != Asp {
-		tT = "ALP"
+	tT := "ASAP"
+	if t.t != Asap {
+		tT = "ALAP"
 	}
-	return fmt.Sprintf("Task #%d, %s: %f", t.n, tT, t.d)
+	return fmt.Sprintf("Task %s: %.2f", tT, t.d)
+}
+
+func (t *Task) SetStartTime(s float32) {
+	t.s = s
 }
 
 func (t *Task) SetEarliest(e float32) {
@@ -48,10 +48,26 @@ func (t *Task) SetLatest(l float32) {
 	t.l = l
 }
 
-func (t *Task) Number() int {
-	return t.n
+func (t *Task) Type() int {
+	return t.t
 }
 
-func (t *Task) GetTypeAndDuration() (int, float32) {
-	return t.t, t.d
+func (t *Task) Duration() float32 {
+	return t.d
+}
+
+func (t *Task) StartTime() float32 {
+	return t.s
+}
+
+func (t *Task) Earliest() float32 {
+	return t.e
+}
+
+func (t *Task) Latest() float32 {
+	return t.l
+}
+
+func (t *Task) Remark() string {
+	return t.r
 }
