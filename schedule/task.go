@@ -12,10 +12,12 @@ const (
 // Taks type includes type (ASAP or ALAP), remark, start time,
 // duration, earliest and latest start time.
 type Task struct {
-	t    int
-	r    string
-	s, d float32
-	e, l float32
+	TT       int     // Type of task
+	Remark   string  // Comment
+	StartT   float32 // Time to start
+	Duration float32 // Duration of task
+	Earliest float32 // Earliest time to start
+	Latest   float32 // Latest time to start
 }
 
 // NewTask returns new task by number, type, remark and duration
@@ -30,44 +32,8 @@ func NewTask(t int, r string, d float32) *Task {
 // String returns short information about task.
 func (t *Task) String() string {
 	tT := "ASAP"
-	if t.t != Asap {
+	if t.TT != Asap {
 		tT = "ALAP"
 	}
-	return fmt.Sprintf("Task %s: %.2f", tT, t.d)
-}
-
-func (t *Task) SetStartTime(s float32) {
-	t.s = s
-}
-
-func (t *Task) SetEarliest(e float32) {
-	t.e = e
-}
-
-func (t *Task) SetLatest(l float32) {
-	t.l = l
-}
-
-func (t *Task) Type() int {
-	return t.t
-}
-
-func (t *Task) Duration() float32 {
-	return t.d
-}
-
-func (t *Task) StartTime() float32 {
-	return t.s
-}
-
-func (t *Task) Earliest() float32 {
-	return t.e
-}
-
-func (t *Task) Latest() float32 {
-	return t.l
-}
-
-func (t *Task) Remark() string {
-	return t.r
+	return fmt.Sprintf("%s %s: %.2f", t.Remark, tT, t.Duration)
 }
