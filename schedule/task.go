@@ -12,21 +12,21 @@ const (
 // Taks type includes type (ASAP or ALAP), remark, start time,
 // duration, earliest and latest start time.
 type Task struct {
-	TT       int     // Type of task
-	Remark   string  // Comment
-	StartT   float32 // Time to start
-	Duration float32 // Duration of task
-	Earliest float32 // Earliest time to start
-	Latest   float32 // Latest time to start
+	TT       int    // Type of task
+	Remark   string // Comment
+	Duration int    // Duration of task
+	Start    int    // Time to start
+	Earliest int    // Earliest time to start
+	Latest   int    // Latest time to start
 }
 
 // NewTask returns new task by number, type, remark and duration
 // with zero earliest and latest start time.
-func NewTask(t int, r string, d float32) *Task {
+func NewTask(t int, r string, d int) *Task {
 	if t != Asap {
 		t = Alap
 	}
-	return &Task{t, r, 0.0, d, 0.0, 0.0}
+	return &Task{t, r, d, 0, 0, 0}
 }
 
 // String returns short information about task.

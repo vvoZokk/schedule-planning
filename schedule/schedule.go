@@ -15,6 +15,7 @@ type Schedule struct {
 	tasks []Task
 	links []Link
 	cp    []int
+	// добавить map
 }
 
 // New returns new schedule with empty lists.
@@ -32,7 +33,7 @@ func next(l Link) int {
 
 // CreateTask creates new task and returns its number in list
 // and nil or error.
-func (s *Schedule) CreateTask(t int, r string, d float32) (int, error) {
+func (s *Schedule) CreateTask(t int, r string, d int) (int, error) {
 	if d < 0 {
 		err := errors.New(fmt.Sprintf("Incorrect duration %f", d))
 		return len(s.tasks) - 1, err
@@ -59,4 +60,74 @@ func (s *Schedule) CreateLink(p, n int) error {
 		s.links = append(s.links, Link{p, n})
 	}
 	return nil
+}
+
+func (s *Schedule) findRoot(elem func(Link) int) []int {
+	result := make([]int, 0)
+	for i, _ := range s.tasks {
+		flag := true
+		for _, link := range s.links {
+			if i == elem(link) {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			result = append(result, i)
+		}
+	}
+	return result
+}
+
+func (s *Schedule) findRelative(e, r func(Link) int) map[int][]int {
+	result := make(map[int][]int, 0)
+	for i, _ := range s.tasks {
+		result[i] = make([]int, 0)
+	}
+	for _, link := range s.links {
+		if slice, ok := result[e(link)]; ok {
+			slice = append(slice, r(link))
+			result[e(link)] = slice
+		} else {
+			result[e(link)] = []int{r(link)}
+		}
+	}
+	return result
+}
+
+func (s *Schedule) findEarliest(root []int, m map[int][]int) {
+	for i := 0; i < len(root); i++ {
+		elem := root[i]
+		root = append(root, m[elem]...)
+		for _, child := range m[elem] {
+			time := s.tasks[elem].Earliest + s.tasks[elem].Duration
+			if time > s.tasks[child].Earliest {
+				s.tasks[child].Earliest = time
+			}
+		}
+	}
+}
+
+func (s *Schedule) findLatest(root []int, m map[int][]int) {
+	// find max time
+	var max int = 0
+	for _, elem := range root {
+		if time := s.tasks[elem].Earliest + s.tasks[elem].Duration; max < time {
+			max = time
+		}
+	}
+	for i, _ := range s.tasks {
+		s.tasks[i].Latest = max - s.tasks[i].Duration
+	}
+	// find latest time for each task
+	for i := 0; i < len(root); i++ {
+		elem := root[i]
+		root = append(root, m[elem]...)
+		for _, parent := range m[elem] {
+			time := s.tasks[elem].Latest - s.tasks[parent].Duration
+			if time < s.tasks[parent].Latest {
+				s.tasks[parent].Latest = time
+			}
+		}
+	}
 }
