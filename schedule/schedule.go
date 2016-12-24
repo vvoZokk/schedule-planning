@@ -14,13 +14,11 @@ type Link struct {
 type Schedule struct {
 	tasks []Task
 	links []Link
-	cp    []int
-	// добавить map
 }
 
 // New returns new schedule with empty lists.
 func New() *Schedule {
-	return &Schedule{make([]Task, 0), make([]Link, 0), []int{}}
+	return &Schedule{make([]Task, 0), make([]Link, 0)}
 }
 
 func previous(l Link) int {
@@ -130,4 +128,56 @@ func (s *Schedule) findLatest(root []int, m map[int][]int) {
 			}
 		}
 	}
+}
+
+func (s *Schedule) CalculateCP() ([]int, []int) {
+	// map of cheldren
+	children := s.findRelative(previous, next)
+	// map of parents
+	parents := s.findRelative(next, previous)
+
+	s.findEarliest(s.findRoot(next), children)
+	s.findLatest(s.findRoot(previous), parents)
+
+	// find time to start for each task
+	root := s.findRoot(next)
+	for _, elem := range root {
+		if s.tasks[elem].TT == Alap {
+			s.tasks[elem].Start = s.tasks[elem].Latest
+		}
+	}
+	root = s.findRoot(previous)
+	for i := 0; i < len(root); i++ {
+		elem := root[i]
+		root = append(root, parents[elem]...)
+		for _, parent := range parents[elem] {
+			if s.tasks[elem].TT == Asap {
+				time := s.tasks[parent].Latest + s.tasks[parent].Duration
+				if s.tasks[parent].TT == Alap && time > s.tasks[elem].Earliest {
+					s.tasks[elem].Start = time
+				} else {
+					if s.tasks[elem].Start == 0 {
+						s.tasks[elem].Start = s.tasks[elem].Earliest
+					}
+				}
+			} else {
+				s.tasks[elem].Start = s.tasks[elem].Latest
+			}
+		}
+	}
+	// find critical path
+	cp := make([]int, 0)
+	other := make([]int, 0)
+	for i, t := range s.tasks {
+		if t.Earliest == t.Latest {
+			cp = append(cp, i)
+		} else {
+			other = append(other, i)
+		}
+	}
+	return cp, other
+}
+
+func (s *Schedule) Tasks() []Task {
+	return s.tasks
 }
