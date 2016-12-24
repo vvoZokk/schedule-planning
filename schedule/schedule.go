@@ -1,3 +1,4 @@
+// Package schedule implements the critical path method (CPM) for scheduling.
 package schedule
 
 import (
@@ -10,13 +11,13 @@ type Link struct {
 	previous, next int
 }
 
-// Schedule with task list, list of links and critical path.
+// Schedule with slice of tasks and slice of links.
 type Schedule struct {
 	tasks []Task
 	links []Link
 }
 
-// New returns new schedule with empty lists.
+// New returns new schedule with empty slices.
 func New() *Schedule {
 	return &Schedule{make([]Task, 0), make([]Link, 0)}
 }
@@ -29,23 +30,23 @@ func next(l Link) int {
 	return l.next
 }
 
-// CreateTask creates new task and returns its number in list
+// CreateTask creates new task and returns length of task list
 // and nil or error.
 func (s *Schedule) CreateTask(t int, r string, d int) (int, error) {
 	if d < 0 {
-		err := errors.New(fmt.Sprintf("Incorrect duration %f", d))
-		return len(s.tasks) - 1, err
+		err := errors.New(fmt.Sprintf("Incorrect duration: %f", d))
+		return len(s.tasks), err
 	} else {
 		task := *NewTask(t, r, d)
 		s.tasks = append(s.tasks, task)
 	}
-	return len(s.tasks) - 1, nil
+	return len(s.tasks), nil
 }
 
 // CreateLink creates new link between existing tasks and
 // returns nil or error.
 func (s *Schedule) CreateLink(p, n int) error {
-	if p < 0 && n < 0 {
+	if p < 0 || n < 0 || p == n {
 		err := errors.New(fmt.Sprintf("Incorrect link: previous %d, next %d", p, n))
 		return err
 	} else if p >= len(s.tasks) {
@@ -130,7 +131,9 @@ func (s *Schedule) findLatest(root []int, m map[int][]int) {
 	}
 }
 
-func (s *Schedule) CalculateCP() ([]int, []int) {
+// CalculateCP finds critical path for schedule and returns
+// slice of numbers of critical path tasks.
+func (s *Schedule) CalculateCP() []int {
 	// map of cheldren
 	children := s.findRelative(previous, next)
 	// map of parents
@@ -167,17 +170,15 @@ func (s *Schedule) CalculateCP() ([]int, []int) {
 	}
 	// find critical path
 	cp := make([]int, 0)
-	other := make([]int, 0)
 	for i, t := range s.tasks {
 		if t.Earliest == t.Latest {
 			cp = append(cp, i)
-		} else {
-			other = append(other, i)
 		}
 	}
-	return cp, other
+	return cp
 }
 
+// Tasks return slice of tasks.
 func (s *Schedule) Tasks() []Task {
 	return s.tasks
 }

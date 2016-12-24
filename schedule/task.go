@@ -9,8 +9,8 @@ const (
 	Alap        // as late as possible
 )
 
-// Taks type includes type (ASAP or ALAP), remark, start time,
-// duration, earliest and latest start time.
+// Taks type includes type (ASAP or ALAP), remark, duration,
+// start time, earliest and latest start time.
 type Task struct {
 	TT       int    // Type of task
 	Remark   string // Comment
@@ -20,8 +20,8 @@ type Task struct {
 	Latest   int    // Latest time to start
 }
 
-// NewTask returns new task by number, type, remark and duration
-// with zero earliest and latest start time.
+// NewTask returns new task by type, remark and duration
+// with zero earliest, latest and start times.
 func NewTask(t int, r string, d int) *Task {
 	if t != Asap {
 		t = Alap
@@ -29,7 +29,7 @@ func NewTask(t int, r string, d int) *Task {
 	return &Task{t, r, d, 0, 0, 0}
 }
 
-// String returns short information about task.
+// String returns string with short information about task.
 func (t *Task) String() string {
 	tT := "ASAP"
 	if t.TT != Asap {

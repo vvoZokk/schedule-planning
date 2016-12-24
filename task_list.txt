@@ -1,0 +1,11 @@
+# task	start	finish	early	late
+Task_0	    0	   13	    0	    0
+Task_1	   13	   30	   13	   13
+Task_2	   21	   35	    0	   21
+Task_3	   30	   41	   30	   30
+Task_4	   35	   51	   14	   35
+Task_5	   41	   52	   41	   41
+Task_6	    0	   16	    0	   24
+Task_7	   35	   47	   30	   40
+Task_8	   52	   62	   52	   52
+Task_9	   30	   41	   30	   51
