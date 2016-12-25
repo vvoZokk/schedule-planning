@@ -1,4 +1,3 @@
-// Example of using critical path method (CPM) for scheduling.
 package main
 
 import (
@@ -52,9 +51,9 @@ func PrintCP(s *schedule.Schedule, cp []int) string {
 		bufer.WriteString(fmt.Sprintf("[%s", t.Remark))
 		for i := 0; i < t.Duration-7; i++ {
 			if flag {
-				bufer.WriteString(":")
+				bufer.WriteString("#")
 			} else {
-				bufer.WriteString("~")
+				bufer.WriteString(":")
 			}
 		}
 		bufer.WriteString("]")
